@@ -10,7 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="lobby" element={<Lobby />} />
+          <Route path="/lobby" element={<Lobby />} />
         </Route>
       </Routes>
     </AuthWrapper>
