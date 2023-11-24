@@ -8,7 +8,7 @@ function App() {
   return (
     <AuthWrapper>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/ticktacktoetest/*" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="/lobby" element={<Lobby />} />
         </Route>
