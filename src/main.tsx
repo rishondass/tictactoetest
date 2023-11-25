@@ -3,13 +3,15 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import AuthWrapper from "./AuthWrapper.tsx";
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  
   <React.StrictMode>
-    <BrowserRouter basename="/tictactoetest">
-    <Routes>
-      <Route path="/*" element={<App />}/>
-    </Routes>
-    </BrowserRouter>
+    <AuthWrapper>
+      <BrowserRouter basename="/tictactoetest/">
+        <Routes>
+          <Route path="/*" element={<App />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthWrapper>
   </React.StrictMode>
 );

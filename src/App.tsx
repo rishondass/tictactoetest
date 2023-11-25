@@ -1,19 +1,22 @@
-import { Route, Routes} from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Home from "./Home";
 import Lobby from "./Lobby";
 import Layout from "./Layout.tsx";
-import AuthWrapper from "./AuthWrapper.tsx";
 
+import AuthRequire from "./AuthRequire.tsx";
 function App() {
   return (
-    <AuthWrapper>
+    
       <Routes>
-        <Route path="/ticktacktoetest/*" element={<Layout />}>
+        <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="/lobby" element={<Lobby />} />
+
+          {/* Protected Router */}
+          <Route element={<AuthRequire/>}>
+            <Route path="/lobby" element={<Lobby />} />
+          </Route>
         </Route>
       </Routes>
-    </AuthWrapper>
   );
 }
 

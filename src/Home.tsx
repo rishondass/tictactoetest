@@ -1,57 +1,99 @@
-import { useState, ChangeEvent, memo, useEffect } from "react";
+import { useState, ChangeEvent, memo, useEffect} from "react";
 import { socket } from "./SocketConn";
-import { useNavigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import { AuthData } from "./AuthWrapper";
+import dice from "./assets/images/dice.png";
+import { nouns, adjectives } from "./Nouns";
 
 const Home = memo(() => {
-  const [nameInput, setNameInput] = useState<string>();
+  const authData = AuthData();
+  
+  const [nameInput, setNameInput] = useState<string>(authData.user.name?authData.user.name:"");
+  const [classes, setClasses] = useState<string>(
+    "ml-11 border-2 rounded-md outline-none p-2"
+  );
+  const [errorMessages, setErrorMessages] = useState<string>("");
 
   const Navigate = useNavigate();
+  
   useEffect(() => {
-    console.log("Lobby component mounted");
+    console.log("Home component mounted");
     return () => {
-      console.log("Lobby component unmounted");
+      console.log("Home component unmounted");
     };
   }, []);
-  function handleInput(event: ChangeEvent<HTMLInputElement>) {
-    setNameInput(event.target.value);
-  }
 
+
+  function handleInput(event: ChangeEvent<HTMLInputElement>) {
+    event.target.value
+      ? (setNameInput(event.target.value),
+        setClasses("ml-11 border-2 rounded-md outline-none p-2"))
+      : (setNameInput(event.target.value),
+        setClasses(
+          "ml-11 border-2 border-red-400 rounded-md outline-none p-2"
+        ));
+  }
   function handleNext() {
     if (nameInput) {
-      console.log("Navigating to /lobby");
-      socket.emit("change-username", nameInput);
-
-      AuthData()
+      setErrorMessages("");
+      authData
         .login(nameInput)
         .then(() => {
-          Navigate("/lobby");
+          socket.emit("change-username", {...authData.user, name: nameInput},(message:string)=>{
+            message === "200" ? Navigate("lobby"):setErrorMessages(message) ;
+          });
+          
         })
         .catch((error: string) => {
           console.log(error);
         });
+    }else{
+      setClasses(
+        "ml-11 border-2 border-red-400 rounded-md outline-none p-2"
+      );
     }
   }
+  function handleRandomName() {
+    setNameInput(
+      adjectives[Math.floor(Math.random() * adjectives.length)] +"_"+
+        nouns[Math.floor(Math.random() * nouns.length)]
+    );
+    setClasses("ml-11 border-2 rounded-md outline-none p-2");
+  }
 
-  const classes = nameInput
-    ? "border-2 rounded-md outline-none p-2"
-    : "border-2 border-red-400 rounded-md outline-none p-2";
+  useEffect(() => {
+    authData.user?.name != ""&&authData.user.isAuthenticated && (
+      socket.emit("remove-player", authData.user),
+      sessionStorage.setItem("user", JSON.stringify({...authData.user,name:"",isAuthenticated:true}))
+    )
+  },[]);
+  
 
   return (
     <>
+      <div className=" text-center">
+        {errorMessages && <span className="bg-red-500 text-white p-2 px-10 rounded-md">{errorMessages}</span>}
+        
+      </div>
       <h1 className="text-green-600 text-3xl font-semibold text-center pt-10">
         Tic Tack Toe
       </h1>
-      <div className="text-center p-5">
+      <div className="p-5 flex items-center justify-center">
         <input
           type="text"
           name=""
           placeholder="name"
           className={classes}
           onChange={handleInput}
+          value={nameInput}
+        />
+        <img
+          className="object-contain ml-2 justify-self-end cursor-pointer"
+          alt="dice_img"
+          src={dice}
+          onClick={handleRandomName}
         />
       </div>
-      <h2>{nameInput}</h2>
       <div className="text-center">
         <button
           className="bg-green-400 rounded-md p-2 text-white"

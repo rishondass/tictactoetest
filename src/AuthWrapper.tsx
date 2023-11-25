@@ -1,6 +1,6 @@
 import React from "react";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState} from "react";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -16,19 +16,27 @@ type AuthContextType = {
   logout: () => void;
 };
 
+
+//sessionStorage.getItem("user")  {user: JSON.parse(sessionStorage.getItem("user")||"")} as Partial<AuthContextType>
+
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
-export const AuthData = () => useContext(AuthContext);
+export function AuthData(){return useContext(AuthContext)};
 
 const AuthWrapper: React.FC<{ children: React.ReactChild }> = ({ children }) =>{
-  const [user, setUser] = useState<Player>({
+  const [globalUser, setGlobalUser] = useState<Player>({
     id: uuidv4().toString(),
     name: "",
     isAuthenticated: false,
   });
+  
+  sessionStorage.getItem("user") && globalUser.name=="" && !globalUser.isAuthenticated && setGlobalUser(JSON.parse(sessionStorage.getItem("user")||""))
+
   const login = (userName: string) => {
     return new Promise<string>((resolve, reject) => {
       if (userName) {
-        setUser({ id: user.id, name: userName, isAuthenticated: true });
+        const tempUser:Player = { id: globalUser.id, name: userName, isAuthenticated: true };
+        setGlobalUser(tempUser);
+        sessionStorage.setItem("user",JSON.stringify(tempUser));
         resolve("success");
       } else {
         reject("Name not set");
@@ -37,11 +45,11 @@ const AuthWrapper: React.FC<{ children: React.ReactChild }> = ({ children }) =>{
   };
 
   const logout = () => {
-    setUser({ ...user, name: "", isAuthenticated: false });
+    setGlobalUser({ ...globalUser, name: "", isAuthenticated: false });
   };
 
   const contextValue: AuthContextType = {
-    user,
+    user: globalUser,
     login,
     logout,
   };
