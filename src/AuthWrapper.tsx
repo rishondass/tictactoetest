@@ -17,7 +17,6 @@ type AuthContextType = {
 };
 
 
-//sessionStorage.getItem("user")  {user: JSON.parse(sessionStorage.getItem("user")||"")} as Partial<AuthContextType>
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 export function AuthData(){return useContext(AuthContext)};
@@ -48,14 +47,8 @@ const AuthWrapper: React.FC<{ children: React.ReactChild }> = ({ children }) =>{
     setGlobalUser({ ...globalUser, name: "", isAuthenticated: false });
   };
 
-  const contextValue: AuthContextType = {
-    user: globalUser,
-    login,
-    logout,
-  };
-
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider value={{user:globalUser,login,logout}}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,4 +1,4 @@
 import {io} from 'socket.io-client';
 
 
-export const socket = io('https://testserver.rishondass.com');
+export const socket = io('http://localhost:3000/');

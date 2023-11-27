@@ -1,28 +1,29 @@
-import { useState, ChangeEvent, memo, useEffect} from "react";
+import { useState, ChangeEvent, memo, useEffect } from "react";
 import { socket } from "./SocketConn";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthData } from "./AuthWrapper";
 import dice from "./assets/images/dice.png";
 import { nouns, adjectives } from "./Nouns";
 
 const Home = memo(() => {
   const authData = AuthData();
-  
-  const [nameInput, setNameInput] = useState<string>(authData.user.name?authData.user.name:"");
+
+  const [nameInput, setNameInput] = useState<string>(
+    authData.user.name ? authData.user.name : ""
+  );
   const [classes, setClasses] = useState<string>(
     "ml-11 border-2 rounded-md outline-none p-2"
   );
   const [errorMessages, setErrorMessages] = useState<string>("");
 
   const Navigate = useNavigate();
-  
+
   useEffect(() => {
     console.log("Home component mounted");
     return () => {
       console.log("Home component unmounted");
     };
   }, []);
-
 
   function handleInput(event: ChangeEvent<HTMLInputElement>) {
     event.target.value
@@ -39,42 +40,50 @@ const Home = memo(() => {
       authData
         .login(nameInput)
         .then(() => {
-          socket.emit("change-username", {...authData.user, name: nameInput},(message:string)=>{
-            message === "200" ? Navigate("lobby"):setErrorMessages(message) ;
-          });
-          
+          socket.emit(
+            "change-username",
+            { ...authData.user, name: nameInput },
+            (message: string) => {
+              message === "200" ? Navigate("lobby") : setErrorMessages(message);
+            }
+          );
         })
         .catch((error: string) => {
           console.log(error);
         });
-    }else{
-      setClasses(
-        "ml-11 border-2 border-red-400 rounded-md outline-none p-2"
-      );
+    } else {
+      setClasses("ml-11 border-2 border-red-400 rounded-md outline-none p-2");
     }
   }
   function handleRandomName() {
     setNameInput(
-      adjectives[Math.floor(Math.random() * adjectives.length)] +"_"+
+      adjectives[Math.floor(Math.random() * adjectives.length)] +
+        "_" +
         nouns[Math.floor(Math.random() * nouns.length)]
     );
     setClasses("ml-11 border-2 rounded-md outline-none p-2");
   }
 
   useEffect(() => {
-    authData.user?.name != ""&&authData.user.isAuthenticated && (
-      socket.emit("remove-player", authData.user),
-      sessionStorage.setItem("user", JSON.stringify({...authData.user,name:"",isAuthenticated:true}))
-    )
-  },[]);
-  
+    authData.user?.name != "" &&
+      authData.user.isAuthenticated &&
+      (socket.emit("remove-player", authData.user),
+      sessionStorage.setItem(
+        "user",
+        JSON.stringify({ ...authData.user, name: "", isAuthenticated: true })
+      ));
+  }, []);
 
   return (
     <>
-      <div className=" text-center">
-        {errorMessages && <span className="bg-red-500 text-white p-2 px-10 rounded-md">{errorMessages}</span>}
-        
-      </div>
+      {errorMessages && (
+        <div className="text-center">
+          <span className="bg-red-500 text-white p-2 px-10 rounded-md">
+            {errorMessages}
+          </span>
+        </div>
+      )}
+
       <h1 className="text-green-600 text-3xl font-semibold text-center pt-10">
         Tic Tack Toe
       </h1>
