@@ -18,12 +18,7 @@ const Home = memo(() => {
 
   const Navigate = useNavigate();
 
-  useEffect(() => {
-    console.log("Home component mounted");
-    return () => {
-      console.log("Home component unmounted");
-    };
-  }, []);
+ 
 
   function handleInput(event: ChangeEvent<HTMLInputElement>) {
     event.target.value

@@ -1,22 +1,15 @@
-import {MouseEvent } from "react";
-
 
 type Props = {
+  index: number;
   value: string;
-  onSelect : (event : MouseEvent) => void;
+  selectSquare: (index:number,value:string)=>void;
 };
 
-function Square({value, onSelect}: Props) {
-  // const [squareState, setSquareState] = useState(0);
-
-  // function handleClick(event: MouseEvent){
-  //   squareState == 0 ? setSquareState(1) : setSquareState(0);
-  //   console.log(squareState);
-  // }
-
-  return <button className="p-4" onClick={onSelect}>
+function Square({value,index,selectSquare}: Props) {
+  return <button onClick={()=>(selectSquare(index,value))} className="text-3xl p-4 w-20 h-20 bg-blue-300">
     {value}
-    </button>;
+  </button>;
+  
 }
 
 export default Square;

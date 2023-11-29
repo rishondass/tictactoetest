@@ -6,7 +6,6 @@ import {useState} from "react";
 
 function Lobby() {
   const Navigate = useNavigate();
-  //console.log(JSON.parse(sessionStorage.getItem("user") || ""));
   const [errorMessages] = useState("");
 
   return (

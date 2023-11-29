@@ -21,16 +21,14 @@ function Rooms() {
   const { user } = AuthData();
 
   const [rooms, setRooms] = useState<Room[]>([]);
-  
+  const [createClick, setCreateClick] = useState(false);
   
   useEffect(() => {
     socket.emit("get-rooms-data", (rooms: []) => {
-      console.log(rooms);
       if (rooms.length > 0) {
         setRooms(rooms);
       }
       if (rooms.length < 1 && sessionStorage.getItem("currentRoom")) {
-        console.log("first");
         sessionStorage.removeItem("currentRoom");
       }
     });
@@ -42,7 +40,6 @@ function Rooms() {
     const handleReceiveRooms = (data: Room[]) => {
       setRooms(data);
       if (data.length < 1 && sessionStorage.getItem("currentRoom")) {
-        console.log("update room");
         sessionStorage.removeItem("currentRoom");
       }
     };
@@ -60,6 +57,7 @@ function Rooms() {
       players: {},
       board: Array(9).fill(null),
     });
+    setCreateClick(true);
   }
   const RoomInfo = memo(
     ({
@@ -78,10 +76,7 @@ function Rooms() {
           console.error(
             "You're already in a room: " + sessionStorage.getItem("currentRoom")
           );
-
-          // errorFn(
-          //   "You're already in a room: " + sessionStorage.getItem("currentRoom")
-          // );
+          
         } else {
           socket.emit(
             "join-room",
@@ -90,10 +85,8 @@ function Rooms() {
             (err: string, players: Player) => {
               if (err) {
                 console.error(err);
-                //errorFn(err);
               } else {
                 setPlayerCount(Object.keys(players).length);
-                sessionStorage.setItem("currentRoom", roomID);
                 Navigate("/board/" + roomID);
               }
             }
@@ -149,12 +142,22 @@ function Rooms() {
   return (
     <>
       <div className="text-center">
+      {!createClick?
         <button
-          className="bg-red-400 rounded text-white p-4"
-          onClick={handleClick}
-        >
-          Add room
-        </button>
+        className="bg-red-400 rounded text-white p-4"
+        onClick={handleClick}
+      >
+        Add room
+      </button>:
+      <button
+      className="bg-gray-400 rounded text-white p-4"
+    >
+      Add room
+    </button>
+    
+    
+    }
+      
       </div>
       <div className="grid grid-cols-3 w-full p-4 gap-4">
         {rooms.map((room, index) => {
